@@ -84,7 +84,7 @@ is set and in the past, the session will be discarded.
 
 =head1 ATTRIBUTES
 
-=head2 secret_key
+=head2 secret_key (required)
 
 This is used to secure the cookies.  Encryption keys and message authentication
 keys are derived from this using one-way functions.  Changing it will

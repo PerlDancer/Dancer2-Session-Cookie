@@ -24,7 +24,7 @@ with 'Dancer::Core::Role::SessionFactory';
 # Attributes
 #--------------------------------------------------------------------------#
 
-=attr secret_key
+=attr secret_key (required)
 
 This is used to secure the cookies.  Encryption keys and message authentication
 keys are derived from this using one-way functions.  Changing it will
