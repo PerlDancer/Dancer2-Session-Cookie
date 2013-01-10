@@ -9,19 +9,25 @@ use LWP::UserAgent;
 use HTTP::Date qw/str2time/;
 use File::Spec;
 
-sub extract_cookie {
+sub find_cookie {
   my ($res) = @_;
   my @cookies = $res->header('set-cookie');
   for my $c (@cookies) {
     next unless $c =~ /dancer\.session/;
-    my @parts = split /;\s+/, $c;
-    my %hash =
-      map { my ( $k, $v ) = split /\s*=\s*/; $v ||= 1; ( lc($k), $v ) } @parts;
-    $hash{expires} = str2time( $hash{expires} )
-      if $hash{expires};
-    return \%hash;
+    return $c;
   }
   return;
+}
+
+sub extract_cookie {
+  my ($res) = @_;
+  my $c = find_cookie($res) or return;
+  my @parts = split /;\s+/, $c;
+  my %hash =
+    map { my ( $k, $v ) = split /\s*=\s*/; $v ||= 1; ( lc($k), $v ) } @parts;
+  $hash{expires} = str2time( $hash{expires} )
+    if $hash{expires};
+  return \%hash;
 }
 
 my $tempdir = File::Temp::tempdir( CLEANUP => 1, TMPDIR => 1 );
@@ -33,7 +39,28 @@ my $engine = "Cookie";
 my @configs = (
   {
     label  => "default",
-    config => { secret_key => $secret_key, }
+    config => { secret_key => $secret_key, },
+  },
+  {
+    label  => "with max_duration",
+    config => {
+      secret_key   => $secret_key,
+      max_duration => 86400 * 7,
+    },
+  },
+  {
+    label  => "with cookie_duration",
+    config => {
+      secret_key   => $secret_key,
+      cookie_duration => 3600,
+    },
+  },
+  {
+    label  => "forced_expire",
+    config => {
+      secret_key   => $secret_key,
+      max_duration => -100,
+    },
   },
 );
 
@@ -78,7 +105,12 @@ for my $c (@configs) {
         $cookie = extract_cookie($res);
         ok $cookie, "session cookie set"
           or diag explain $cookie;
-        like $res->content, qr/name='larry'/, "session value looks good";
+        if ( $c->{label} eq 'forced_expire' ) {
+          like $res->content, qr/name=''/, "session value reset";
+        }
+        else {
+          like $res->content, qr/name='larry'/, "session value looks good";
+        }
 
         # session cookie should persist even if we don't touch sessions
         $res = $ua->get("http://127.0.0.1:$port/no_session_data");
@@ -104,7 +136,7 @@ for my $c (@configs) {
 
         # set value into session again
         $res = $ua->get("http://127.0.0.1:$port/set_session/curly");
-        ok $res->is_success, "/set_session/larry";
+        ok $res->is_success, "/set_session/curly";
         $cookie = extract_cookie($res);
         ok $cookie, "session cookie set"
           or diag explain $cookie;
@@ -122,7 +154,24 @@ for my $c (@configs) {
         $cookie = extract_cookie($res);
         ok $cookie, "session cookie set"
           or diag explain $cookie;
-        like $res->content, qr/name='damian'/, "session value looks good";
+        if ( $c->{label} eq 'forced_expire' ) {
+          like $res->content, qr/name=''/, "session value reset";
+        }
+        else {
+          like $res->content, qr/name='damian'/, "session value looks good";
+        }
+
+        # try to manipulate cookie
+        my $cookie_array = $ua->cookie_jar->{COOKIES}{"127.0.0.1"}{"/"}{"dancer.session"};
+        $cookie_array->[1] =~ s/~\d*~/"~" . (time + 100) . "~"/e;
+
+        # read value back
+        $res = $ua->get("http://127.0.0.1:$port/read_session");
+        ok $res->is_success, "/read_session";
+        $cookie = extract_cookie($res);
+        ok $cookie, "session cookie set"
+          or diag explain $cookie;
+        like $res->content, qr/name=''/, "session reset after bad MAC";
 
         File::Temp::cleanup();
       };

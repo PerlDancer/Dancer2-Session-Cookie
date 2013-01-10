@@ -1,4 +1,4 @@
-use 5.008001;
+use 5.010;
 use strict;
 use warnings;
 
@@ -6,9 +6,11 @@ package Dancer::SessionFactory::Cookie;
 # ABSTRACT: Dancer 2 session storage in secure cookies
 # VERSION
 
-use MIME::Base64    ();
-use Sereal::Encoder ();
-use Sereal::Decoder ();
+use Digest::SHA             ();
+use Math::Random::ISAAC::XS ();
+use MIME::Base64            ();
+use Sereal::Encoder         ();
+use Sereal::Decoder         ();
 
 use Moo;
 use Dancer::Core::Types;
@@ -33,6 +35,20 @@ has secret_key => (
   is       => 'ro',
   isa      => Str,
   required => 1,
+);
+
+=attr max_duration
+
+If C<cookie_duration> is not set, this puts a maximum duration on
+the validity of the cookie, regardless of the length of the
+browser session.
+
+=cut
+
+has max_duration => (
+  is        => 'ro',
+  isa       => Int,
+  predicate => 1,
 );
 
 has _encoder => (
@@ -67,6 +83,29 @@ sub _build__decoder {
   );
 }
 
+has _rng => (
+  is      => 'lazy',
+  isa     => InstanceOf ['Math::Random::ISAAC::XS'],
+  handles => { '_irand' => 'irand' },
+);
+
+sub _build__rng {
+  my ($self) = @_;
+  my @seeds;
+  if ( -f "/dev/random" ) {
+    open my $fh, "<:raw", "/dev/random/";
+    my $buf = "";
+    while ( length $buf < 1024 ) {
+      sysread( $fh, $buf, 1024 - length $buf, length $buf );
+    }
+    @seeds = unpack( 'l*', $buf );
+  }
+  else {
+    @seeds = map { rand } 1 .. 256;
+  }
+  return Math::Random::ISAAC::XS->new(@seeds);
+}
+
 #--------------------------------------------------------------------------#
 # Modified SessionFactory methods
 #--------------------------------------------------------------------------#
@@ -81,23 +120,48 @@ before 'cookie' => sub {
   my $session = $params{session};
   return unless ref $session && $session->isa("Dancer::Core::Session");
 
-  if ( $session->expires && $session->expires < time ) {
-    $session->id( $self->_encode_b64( {} ) );
+  # cookie is derived from session data and expiration time
+  my $data    = $session->data;
+  my $expires = $session->expires;
+
+  # if expiration is set, we want to check and clear data; if not,
+  # we might add an expiration based on max_duration
+  if ( defined $expires ) {
+    $data = {} if $expires < time;
   }
   else {
-    $session->id( $self->_encode_b64( $session->data ) );
+    $expires = $self->has_max_duration ? time + $self->max_duration : "";
   }
+
+  # random salt used to derive unique encryption/MAC key for each cookie
+  my $salt = $self->_irand;
+  my $key  = $self->_hmac("$salt~$expires");
+
+  my $msg = join( "~", $salt, $expires, $self->_freeze_b64($data) );
+  $session->id( "$msg~" . $self->_hmac( $msg, $key ) );
 };
 
 #--------------------------------------------------------------------------#
 # SessionFactory implementation methods
 #--------------------------------------------------------------------------#
 
-# Cookie retrieval: extract, decode and verify data
+# Cookie retrieval: extract, verify and decode data
 sub _retrieve {
   my ( $self, $id ) = @_;
   return {} unless length $id;
-  return $self->_decode_b64( $id );
+
+  my ( $salt, $expires, $data, $mac ) = split qr/~/, $id;
+  my $key = $self->_hmac("$salt~$expires");
+
+  # Check MAC
+  my $check_mac = $self->_hmac( join("~", $salt, $expires, $data), $key );
+  return {} unless $check_mac eq $mac;
+
+  # Check expiration
+  return {} if length($expires) && $expires < time;
+
+  # Extract data
+  return $self->_thaw_b64($data);
 }
 
 # We don't actually flush data; instead we modify cookie generation
@@ -114,15 +178,25 @@ sub _sessions { return [] }
 # Private methods
 #--------------------------------------------------------------------------#
 
-sub _encode_b64 {
+sub _construct_value {
+  my ( $self, $data, $expires ) = @_;
+}
+
+sub _freeze_b64 {
   my ( $self, $data ) = @_;
   return MIME::Base64::encode_base64url( $self->_encode($data) );
 }
 
-sub _decode_b64 {
+sub _thaw_b64 {
   my ( $self, $encoded ) = @_;
   $self->_decode( MIME::Base64::decode_base64url($encoded), my $data );
   return $data;
+}
+
+sub _hmac {
+  my ( $self, $msg ) = @_;
+  return MIME::Base64::encode_base64url(
+    Digest::SHA::hmac_sha256( $msg, $self->secret_key ) );
 }
 
 1;
