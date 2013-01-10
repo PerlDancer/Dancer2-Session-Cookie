@@ -66,7 +66,7 @@ Therefore, the session cookie protocol used by this module is as follows:
     | denotes concatenation with a separator character
     E(p,q) is a symmetric encryption of p with key q
     HMAC(p,q) is a keyed message hash of p with key q
-    k is HMAC(salt|expiration, sk)
+    k is HMAC(salt, sk)
     sk is a secret key shared by all servers
 
 The salt value is generated using L<Math::Random::ISAAC::XS>, seeded from
