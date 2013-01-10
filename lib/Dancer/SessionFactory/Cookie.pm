@@ -151,17 +151,17 @@ before 'cookie' => sub {
 # Cookie retrieval: extract, verify and decode data
 sub _retrieve {
   my ( $self, $id ) = @_;
-  return {} unless length $id;
+  return unless length $id;
 
   my ( $salt, $expires, $ciphertext, $mac ) = split qr/~/, $id;
   my $key = hmac_sha256( $salt, $self->secret_key );
 
   # Check MAC
   my $check_mac = hmac_sha256( join( "~", $salt, $expires, $ciphertext ), $key );
-  return {} unless encode_base64url($check_mac) eq $mac;
+  return unless encode_base64url($check_mac) eq $mac;
 
   # Check expiration
-  return {} if length($expires) && $expires < time;
+  return if length($expires) && $expires < time;
 
   # Decode data
   my $cbc = Crypt::CBC->new( -key => $key, -cipher => 'Rijndael' );
