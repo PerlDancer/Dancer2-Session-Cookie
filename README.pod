@@ -21,10 +21,66 @@ version 0.001
 
 =head1 DESCRIPTION
 
-This module implements a session factory for Dancer 2 that stores session
-state within a browser cookie.  It uses AES encryption to protect
-session data, an expiration timestamp (within the cookie value itself) to
-enforce session expiration, and a MAC to ensure integrity.
+This module implements a session factory for Dancer 2 that stores session state
+within a browser cookie.  It serializes data with L<Sereal>, uses AES
+encryption to protect session data, includes an expiration timestamp (within the
+cookie value itself) to enforce session expiration, and uses a MAC to ensure
+integrity.
+
+The session cookie protocol used in this module is based heavily on
+L<A Secure Cookie Protocol|http://www.cse.msu.edu/~alexliu/publications/Cookie/Cookie_COMNET.pdf>
+by Alex Liu and others.  Liu proposes a cookie value as follows:
+
+  user|expiration|E(data,k)|HMAC(user|expiration|data|ssl-key,k)
+
+  where
+
+    | denotes concatenation with a separator character
+    E(p,q) is a symmetric encryption of p with key q
+    HMAC(p,q) is a keyed message hash of p with key q
+    k is HMAC(user|expiration, sk)
+    sk is a secret key shared by all servers
+    ssl-key is an SSL session key
+
+Because SSL session keys are not readily available (and SSL termination
+may happen prior to the application server), we omit C<ssl-key>.  This
+weakens protection against replay attacks if an attacker can break
+the SSL session key and intercept messages.
+
+Using C<user> and C<expiration> to generate the encryption and MAC keys
+was a method proposed to ensure unique keys to defeat volume attacks
+against the secret key.  Rather than rely on those for uniqueness, which
+also reveals user name and prohibits anonymous sessions, we replace
+C<user> with a cryptographically-secure random salt value.
+
+The original proposal also calculates a MAC based on unencrypted
+data.  We instead calculate the MAC based on the encrypted data.  This
+avoids the extra step of decrypting invalid messages.
+
+Therefore, the session cookie protocol used by this module is as follows:
+
+  salt|expiration|E(data,k)|HMAC(salt|expiration|E(data,k),k)
+
+  where
+
+    | denotes concatenation with a separator character
+    E(p,q) is a symmetric encryption of p with key q
+    HMAC(p,q) is a keyed message hash of p with key q
+    k is HMAC(salt|expiration, sk)
+    sk is a secret key shared by all servers
+
+The salt value is generated using L<Math::Random::ISAAC::XS>, seeded from
+C</dev/random>, if available, or from rand(), if not.
+
+The HMAC algorithm is C<hmac_sha256> from L<Digest::SHA>.  Encryption
+is done by L<Crypt::CBC> using L<Crypt::Rijndael> (AES).  The ciphertext and
+MAC's in the cookie are Base64 encoded by L<MIME::Base64>.
+
+Expiration is set from the C<Dancer::Core::Session> object's C<expires>
+attribute, from C<max_duration>, or will be left blank.
+
+During session retrieval, if the MAC does not authenticate or if the expiration
+is set and in the past, the session will be discarded.
 
 =head1 ATTRIBUTES
 
