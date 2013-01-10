@@ -198,10 +198,13 @@ sub _sessions { return [] }
 =head1 DESCRIPTION
 
 This module implements a session factory for Dancer 2 that stores session state
-within a browser cookie.  It serializes data with L<Sereal>, uses AES
-encryption to protect session data, includes an expiration timestamp (within the
-cookie value itself) to enforce session expiration, and uses a MAC to ensure
-integrity.
+within a browser cookie.  Features include:
+
+=for :list
+* Data serialization and compression using L<Sereal>
+* Data encryption using AES with a unique derived key per cookie
+* Enforced expiration timestamp (independent of cookie expiration)
+* Cookie integrity protected with a message authentication code (MAC)
 
 The session cookie protocol used in this module is based heavily on
 L<A Secure Cookie Protocol|http://www.cse.msu.edu/~alexliu/publications/Cookie/Cookie_COMNET.pdf>
@@ -260,17 +263,24 @@ is set and in the past, the session will be discarded.
 
 =head1 LIMITATIONS AND SECURITY
 
+=head2 Secret key
+
+You must protect the secret key, of course.  Rekeying periodically would
+improve security.  Rekeying also invalidates all existing sessions.  In a
+multi-node application, all nodes must share the same secret key.
+
 =head2 Session size
 
 Cookies must fit within 4k, so don't store too much data in the session.
 This module uses L<Sereal> for serialization and does enable the C<snappy>
 compression option, which kicks in over 1K.
 
-=head2 Secret key
+=head2 Objects not stored
 
-You must protect the secret key, of course.  Rekeying periodically would
-improve security.  Rekeying also invalidates all existing sessions.  In a
-multi-node application, all nodes must share the same secret key.
+Session data may not include objects.  Sereal is configured to die if objects
+are encountered because object serialization/deserialiation can have
+undesirable side effects.  Applications should take steps to deflate/inflate
+objects before storing them in session data.
 
 =head2 Transport security
 
@@ -314,8 +324,9 @@ The downside of this is that if there is a read-only attack against the
 database (SQL injection or leaked backup dump) and the secret key is compromised,
 then an attacker can forge a cookie to impersonate any user.
 
-A more secure approach suggested by Stephen Murdoch in "Hardened Stateless
-Session Cookies", is to store an iterated hash of the hashed password in the
+A more secure approach suggested by Stephen Murdoch in
+L<Hardened Stateless Session Cookies|http://www.cl.cam.ac.uk/~sjm217/papers/protocols08cookies.pdf>
+is to store an iterated hash of the hashed password in the
 database and use the hashed password itself within the session.
 
   # on login
@@ -335,6 +346,11 @@ database contents can't be used to impersonate a user because doing so would
 requiring reversing a one-way hash to determine the correct authenticator to
 put into the forged cookie.
 
+Both methods require an additional database read per request. This diminishes
+some of the scalability benefits of storing session data in a cookie, but
+the read could be cached and there is still no database write needed
+to store session data.
+
 =head1 SEE ALSO
 
 Papers on secure cookies and cookie session storage:
@@ -344,12 +360,21 @@ Papers on secure cookies and cookie session storage:
 * Murdoch, Stephen J., L<Hardened Stateless Session Cookies|http://www.cl.cam.ac.uk/~sjm217/papers/protocols08cookies.pdf>
 * Fu, Kevin, et al., L<Dos and Don'ts of Client Authentication on the Web|http://pdos.csail.mit.edu/papers/webauth:sec10.pdf>
 
-Other CPAN modules providing cookie session storage (possibly for other frameworks):
+CPAN modules providing cookie session storage (possibly for other frameworks):
 
 =for :list
-* L<Dancer::Session::Cookie> -- Dancer 1 precursor to this module, encryption only, no MAC
-* L<Plack::Middleware::Session::Cookie> -- MAC only
+* L<Dancer::Session::Cookie> -- Dancer 1 precursor to this module, encryption only
 * L<Catalyst::Plugin::CookiedSession> -- encryption only
+* L<HTTP::CryptoCookie> -- encryption only
+* L<Plack::Middleware::Session::Cookie> -- MAC only
+* L<Plack::Middleware::Session::SerializedCookie> -- really just a framework and you provide the guts with callbacks
+
+Related CPAN modules that offer frameworks for serealizing and encrypting data,
+but without direct application to cookies:
+
+=for :list
+* L<Crypt::Util>
+* L<Data::Serializer>
 
 =cut
 
