@@ -42,10 +42,10 @@ my @configs = (
     config => { secret_key => $secret_key, },
   },
   {
-    label  => "with max_duration",
+    label  => "with default_duration",
     config => {
       secret_key   => $secret_key,
-      max_duration => 86400 * 7,
+      default_duration => 86400 * 7,
     },
   },
   {
@@ -59,7 +59,7 @@ my @configs = (
     label  => "forced_expire",
     config => {
       secret_key   => $secret_key,
-      max_duration => -100,
+      default_duration => -100,
     },
   },
 );

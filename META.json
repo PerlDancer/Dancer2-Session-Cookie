@@ -40,17 +40,10 @@
       },
       "runtime" : {
          "requires" : {
-            "Crypt::CBC" : "0",
-            "Crypt::Rijndael" : "0",
             "Dancer::Core::Role::SessionFactory" : "0",
             "Dancer::Core::Types" : "0",
-            "Digest::SHA" : "0",
-            "MIME::Base64" : "0",
-            "Math::Random::ISAAC::XS" : "0",
             "Moo" : "0",
-            "Sereal::Decoder" : "0",
-            "Sereal::Encoder" : "0",
-            "namespace::clean" : "0",
+            "Session::Storage::Secure" : "0",
             "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
