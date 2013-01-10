@@ -227,7 +227,7 @@ Using C<user> and C<expiration> to generate the encryption and MAC keys
 was a method proposed to ensure unique keys to defeat volume attacks
 against the secret key.  Rather than rely on those for uniqueness, which
 also reveals user name and prohibits anonymous sessions, we replace
-C<user> with a cryptographically-secure random salt value.
+C<user> with a cryptographically-strong random salt value.
 
 The original proposal also calculates a MAC based on unencrypted
 data.  We instead calculate the MAC based on the encrypted data.  This
