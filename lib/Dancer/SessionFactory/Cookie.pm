@@ -366,6 +366,7 @@ CPAN modules providing cookie session storage (possibly for other frameworks):
 * L<Dancer::Session::Cookie> -- Dancer 1 precursor to this module, encryption only
 * L<Catalyst::Plugin::CookiedSession> -- encryption only
 * L<HTTP::CryptoCookie> -- encryption only
+* L<Mojolicious::Sessions> -- MAC only
 * L<Plack::Middleware::Session::Cookie> -- MAC only
 * L<Plack::Middleware::Session::SerializedCookie> -- really just a framework and you provide the guts with callbacks
 
