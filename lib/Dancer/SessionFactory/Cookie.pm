@@ -6,11 +6,14 @@ package Dancer::SessionFactory::Cookie;
 # ABSTRACT: Dancer 2 session storage in secure cookies
 # VERSION
 
-use Digest::SHA             ();
+use Crypt::CBC              ();
+use Crypt::Rijndael         ();
+use Digest::SHA             (qw/hmac_sha256/);
 use Math::Random::ISAAC::XS ();
-use MIME::Base64            ();
+use MIME::Base64            (qw/encode_base64url decode_base64url/);
 use Sereal::Encoder         ();
 use Sereal::Decoder         ();
+use namespace::clean;
 
 use Moo;
 use Dancer::Core::Types;
@@ -54,7 +57,7 @@ has max_duration => (
 has _encoder => (
   is      => 'lazy',
   isa     => InstanceOf ['Sereal::Encoder'],
-  handles => { '_encode' => 'encode' },
+  handles => { '_freeze' => 'encode' },
 );
 
 sub _build__encoder {
@@ -70,7 +73,7 @@ sub _build__encoder {
 has _decoder => (
   is      => 'lazy',
   isa     => InstanceOf ['Sereal::Decoder'],
-  handles => { '_decode' => 'decode' },
+  handles => { '_thaw' => 'decode' },
 );
 
 sub _build__decoder {
@@ -124,8 +127,8 @@ before 'cookie' => sub {
   my $data    = $session->data;
   my $expires = $session->expires;
 
-  # if expiration is set, we want to check and clear data; if not,
-  # we might add an expiration based on max_duration
+  # if expiration is set, we want to check it and possibly clear data;
+  # if not set, we might add an expiration based on max_duration
   if ( defined $expires ) {
     $data = {} if $expires < time;
   }
@@ -134,11 +137,13 @@ before 'cookie' => sub {
   }
 
   # random salt used to derive unique encryption/MAC key for each cookie
-  my $salt = $self->_irand;
-  my $key  = $self->_hmac("$salt~$expires");
+  my $salt       = $self->_irand;
+  my $key        = hmac_sha256( $salt, $self->secret_key );
+  my $cbc        = Crypt::CBC->new( -key => $key, -cipher => 'Rijndael' );
+  my $ciphertext = encode_base64url( $cbc->encrypt( $self->_freeze($data) ) );
+  my $msg        = join( "~", $salt, $expires, $ciphertext );
 
-  my $msg = join( "~", $salt, $expires, $self->_freeze_b64($data) );
-  $session->id( "$msg~" . $self->_hmac( $msg, $key ) );
+  $session->id( "$msg~" . encode_base64url( hmac_sha256( $msg, $key ) ) );
 };
 
 #--------------------------------------------------------------------------#
@@ -150,18 +155,20 @@ sub _retrieve {
   my ( $self, $id ) = @_;
   return {} unless length $id;
 
-  my ( $salt, $expires, $data, $mac ) = split qr/~/, $id;
-  my $key = $self->_hmac("$salt~$expires");
+  my ( $salt, $expires, $ciphertext, $mac ) = split qr/~/, $id;
+  my $key = hmac_sha256( $salt, $self->secret_key );
 
   # Check MAC
-  my $check_mac = $self->_hmac( join("~", $salt, $expires, $data), $key );
-  return {} unless $check_mac eq $mac;
+  my $check_mac = hmac_sha256( join( "~", $salt, $expires, $ciphertext ), $key );
+  return {} unless encode_base64url($check_mac) eq $mac;
 
   # Check expiration
   return {} if length($expires) && $expires < time;
 
-  # Extract data
-  return $self->_thaw_b64($data);
+  # Decode data
+  my $cbc = Crypt::CBC->new( -key => $key, -cipher => 'Rijndael' );
+  $self->_thaw( $cbc->decrypt( decode_base64url($ciphertext) ), my $data );
+  return $data;
 }
 
 # We don't actually flush data; instead we modify cookie generation
@@ -173,31 +180,6 @@ sub _destroy { return }
 # There is no way to know about existing sessions when cookies
 # are used as the store, so we lie and return an empty list.
 sub _sessions { return [] }
-
-#--------------------------------------------------------------------------#
-# Private methods
-#--------------------------------------------------------------------------#
-
-sub _construct_value {
-  my ( $self, $data, $expires ) = @_;
-}
-
-sub _freeze_b64 {
-  my ( $self, $data ) = @_;
-  return MIME::Base64::encode_base64url( $self->_encode($data) );
-}
-
-sub _thaw_b64 {
-  my ( $self, $encoded ) = @_;
-  $self->_decode( MIME::Base64::decode_base64url($encoded), my $data );
-  return $data;
-}
-
-sub _hmac {
-  my ( $self, $msg ) = @_;
-  return MIME::Base64::encode_base64url(
-    Digest::SHA::hmac_sha256( $msg, $self->secret_key ) );
-}
 
 1;
 
