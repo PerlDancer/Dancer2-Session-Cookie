@@ -40,6 +40,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Dancer" : "1.999999",
             "Dancer::Core::Role::SessionFactory" : "0",
             "Dancer::Core::Types" : "0",
             "Moo" : "0",
