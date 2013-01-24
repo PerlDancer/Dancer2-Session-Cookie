@@ -4,7 +4,7 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 4.300029, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "apache_2_0"
    ],
@@ -44,7 +44,7 @@
             "Dancer::Core::Types" : "0",
             "Moo" : "0",
             "Session::Storage::Secure" : "0",
-            "perl" : "5.010",
+            "perl" : "5.008001",
             "strict" : "0",
             "warnings" : "0"
          }
