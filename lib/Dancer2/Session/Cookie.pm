@@ -2,7 +2,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-package Dancer::SessionFactory::Cookie;
+package Dancer2::Session::Cookie;
 # ABSTRACT: Dancer 2 session storage in secure cookies
 # VERSION
 
@@ -129,7 +129,7 @@ security caveats.
 CPAN modules providing cookie session storage (possibly for other frameworks):
 
 =for :list
-* L<Dancer::Session::Cookie> -- Dancer 1 precursor to this module, encryption only
+* L<Dancer::Session::Cookie> -- Dancer 1 equivalent to this module
 * L<Catalyst::Plugin::CookiedSession> -- encryption only
 * L<HTTP::CryptoCookie> -- encryption only
 * L<Mojolicious::Sessions> -- MAC only
@@ -138,4 +138,4 @@ CPAN modules providing cookie session storage (possibly for other frameworks):
 
 =cut
 
-# vim: ts=2 sts=2 sw=2 et:
+# vim: ts=4 sts=4 sw=4 et:
