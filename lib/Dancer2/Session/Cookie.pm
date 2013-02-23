@@ -9,7 +9,7 @@ package Dancer2::Session::Cookie;
 use Session::Storage::Secure ();
 
 use Moo;
-use Dancer::Core::Types;
+use Dancer2::Core::Types;
 
 #--------------------------------------------------------------------------#
 # Attributes
@@ -61,7 +61,7 @@ sub _build__store {
   return Session::Storage::Secure->new(%args);
 }
 
-with 'Dancer::Core::Role::SessionFactory';
+with 'Dancer2::Core::Role::SessionFactory';
 
 #--------------------------------------------------------------------------#
 # Modified SessionFactory methods
@@ -75,7 +75,7 @@ sub generate_id { '' }
 before 'cookie' => sub {
   my ( $self, %params ) = @_;
   my $session = $params{session};
-  return unless ref $session && $session->isa("Dancer::Core::Session");
+  return unless ref $session && $session->isa("Dancer2::Core::Session");
   $session->id( $self->_freeze( $session->data, $session->expires ) );
 };
 

@@ -97,7 +97,8 @@ for my $c (@configs) {
         ok $cookie, "session cookie set"
           or diag explain $cookie;
         my $sid2 = $cookie->{"dancer.session"};
-        isnt $sid2, $sid1, "changing data changes session ID";
+        isnt( $sid2, $sid1, "changing data changes session ID")
+            or diag explain $cookie;
 
         # read value back
         $res = $ua->get("http://127.0.0.1:$port/read_session");
@@ -179,7 +180,7 @@ for my $c (@configs) {
     server => sub {
       my $port = shift;
 
-      use Dancer 1.999;
+      use Dancer2;
 
       get '/no_session_data' => sub {
         return "session not modified";
@@ -218,7 +219,7 @@ for my $c (@configs) {
         port         => $port
       );
 
-      Dancer->runner->server->port($port);
+      Dancer2->runner->server->port($port);
       start;
     },
   );
