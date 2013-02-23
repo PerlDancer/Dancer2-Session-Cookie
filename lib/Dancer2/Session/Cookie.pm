@@ -98,6 +98,7 @@ sub _sessions { return [] }
 1;
 
 =for Pod::Coverage method_names_here
+generate_id
 
 =head1 SYNOPSIS
 

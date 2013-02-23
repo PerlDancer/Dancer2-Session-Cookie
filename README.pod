@@ -63,6 +63,7 @@ a period of time, regardless of the length of the browser session.  It is
 unset by default, meaning that sessions expiration is not capped.
 
 =for Pod::Coverage method_names_here
+generate_id
 
 =head1 SEE ALSO
 
