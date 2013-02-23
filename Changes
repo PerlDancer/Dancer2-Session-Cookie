@@ -1,8 +1,14 @@
-Revision history for Dancer-SessionFactory-Cookie
+Revision history for Dancer2-Session-Cookie
 
 {{$NEXT}}
 
+    [CHANGED]
+
+    - Renamed from Dancer-Session-Factory-Cookie to Dancer2-Session-Cookie
+
+    - Internals updated for new Dancer2 release
+
 0.001     2013-01-24 17:33:57 America/New_York
 
-  - First release
+    - First release
 

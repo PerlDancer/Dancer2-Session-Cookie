@@ -2,11 +2,11 @@
 
 =head1 NAME
 
-Dancer::SessionFactory::Cookie - Dancer 2 session storage in secure cookies
+Dancer2::Session::Cookie - Dancer 2 session storage in secure cookies
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -72,7 +72,7 @@ CPAN modules providing cookie session storage (possibly for other frameworks):
 
 =item *
 
-L<Dancer::Session::Cookie> -- Dancer 1 precursor to this module, encryption only
+L<Dancer::Session::Cookie> -- Dancer 1 equivalent to this module
 
 =item *
 
@@ -103,7 +103,7 @@ L<Plack::Middleware::Session::SerializedCookie> -- really just a framework and y
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests through the issue tracker
-at L<https://github.com/dagolden/dancer-sessionfactory-cookie/issues>.
+at L<https://github.com/dagolden/dancer2-session-cookie/issues>.
 You will be notified automatically of any progress on your issue.
 
 =head2 Source Code
@@ -111,9 +111,9 @@ You will be notified automatically of any progress on your issue.
 This is open source software.  The code repository is available for
 public review and contribution under the terms of the license.
 
-L<https://github.com/dagolden/dancer-sessionfactory-cookie>
+L<https://github.com/dagolden/dancer2-session-cookie>
 
-  git clone git://github.com/dagolden/dancer-sessionfactory-cookie.git
+  git clone git://github.com/dagolden/dancer2-session-cookie.git
 
 =head1 AUTHOR
 
