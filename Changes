@@ -2,6 +2,10 @@ Revision history for Dancer2-Session-Cookie
 
 {{$NEXT}}
 
+    [FIXED]
+
+    - Fixed Dancer2 dependency version
+
 0.002     2013-02-22 22:26:31 America/New_York
 
     [CHANGED]
