@@ -81,14 +81,12 @@ for my $c (@configs) {
         ok !$cookie, "no cookie set"
           or diag explain $cookie;
 
-        # empty session created if session read attempted
+        # recent Dancer: no session created until session is written
         $res = $ua->get("http://127.0.0.1:$port/read_session");
         ok $res->is_success, "/read_session";
         $cookie = extract_cookie($res);
-        ok $cookie, "session cookie set"
+        ok !$cookie, "no cookie set"
           or diag explain $cookie;
-        my $sid1 = $cookie->{"dancer.session"};
-        like $res->content, qr/name=''/, "empty session";
 
         # set value into session
         $res = $ua->get("http://127.0.0.1:$port/set_session/larry");
@@ -96,9 +94,7 @@ for my $c (@configs) {
         $cookie = extract_cookie($res);
         ok $cookie, "session cookie set"
           or diag explain $cookie;
-        my $sid2 = $cookie->{"dancer.session"};
-        isnt( $sid2, $sid1, "changing data changes session ID")
-            or diag explain $cookie;
+        my $sid1 = $cookie->{"dancer.session"};
 
         # read value back
         $res = $ua->get("http://127.0.0.1:$port/read_session");
@@ -141,6 +137,9 @@ for my $c (@configs) {
         $cookie = extract_cookie($res);
         ok $cookie, "session cookie set"
           or diag explain $cookie;
+        my $sid2 = $cookie->{"dancer.session"};
+        isnt( $sid2, $sid1, "changing data changes session ID")
+            or diag explain $cookie;
 
         # destroy and create a session in one request
         $res = $ua->get("http://127.0.0.1:$port/churn_session");
