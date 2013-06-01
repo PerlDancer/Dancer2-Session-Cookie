@@ -2,6 +2,8 @@ Revision history for Dancer2-Session-Cookie
 
 {{$NEXT}}
 
+0.004     2013-05-31 23:40:09 America/New_York
+
     [CHANGED]
 
     - Requires Session::Storage::Secure 0.007 for improved resistance
