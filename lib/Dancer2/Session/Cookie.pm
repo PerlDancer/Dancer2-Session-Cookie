@@ -6,7 +6,7 @@ package Dancer2::Session::Cookie;
 # ABSTRACT: Dancer 2 session storage in secure cookies
 # VERSION
 
-use Session::Storage::Secure ();
+use Session::Storage::Secure 0.007 ();
 
 use Moo;
 use Dancer2::Core::Types;
