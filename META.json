@@ -4,7 +4,7 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.131490",
+   "generated_by" : "Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.131560",
    "license" : [
       "apache_2_0"
    ],
@@ -62,7 +62,7 @@
             "LWP::UserAgent" : "0",
             "List::Util" : "0",
             "Test::More" : "0.96",
-            "Test::TCP" : "1.13",
+            "Test::TCP" : "1.30",
             "YAML" : "0"
          }
       }
@@ -70,7 +70,7 @@
    "provides" : {
       "Dancer2::Session::Cookie" : {
          "file" : "lib/Dancer2/Session/Cookie.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -85,6 +85,6 @@
          "web" : "https://github.com/dagolden/dancer2-session-cookie"
       }
    },
-   "version" : "0.004"
+   "version" : "0.005"
 }
 
