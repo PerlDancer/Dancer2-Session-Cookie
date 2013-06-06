@@ -3,7 +3,7 @@ use warnings;
 use Test::More 0.96 import => ['!pass']; # subtests
 
 use YAML;
-use Test::TCP 1.13;
+use Test::TCP 1.30;
 use File::Temp 0.22;
 use LWP::UserAgent;
 use HTTP::Date qw/str2time/;
