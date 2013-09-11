@@ -173,6 +173,24 @@ for my $c (@configs) {
           or diag explain $cookie;
         like $res->content, qr/name=''/, "session reset after bad MAC";
 
+
+        if ( $c->{label} ne 'forced_expire' ) {
+          # set session expiry time
+          $res = $ua->get("http://127.0.0.1:$port/set_session_expires");
+          ok $res->is_success, "/set_session_expires";
+          $cookie = extract_cookie($res);
+          ok $cookie->{expires}, "session expiry time set"
+            or diag explain $cookie;
+
+          my $expires = $cookie->{expires};
+
+          # read session to check if expiry time persists
+          $res = $ua->get("http://127.0.0.1:$port/read_session");
+          ok $res->is_success, "/read_session";
+          $cookie = extract_cookie($res);
+          is $cookie->{expires}, $expires, "session cookie expires is persistent";
+        }
+
         File::Temp::cleanup();
       };
     },
@@ -205,6 +223,10 @@ for my $c (@configs) {
         context->destroy_session;
         session name => 'damian';
         return "churned";
+      };
+
+      get '/set_session_expires' => sub {
+        session->expires(5);
       };
 
       setting appdir => $tempdir;
