@@ -1,4 +1,4 @@
-requires "Dancer2" => "0.09";
+requires "Dancer2" => "0.10";
 requires "Dancer2::Core::Role::SessionFactory" => "0";
 requires "Dancer2::Core::Types" => "0";
 requires "Moo" => "0";
