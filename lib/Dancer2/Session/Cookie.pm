@@ -24,9 +24,9 @@ invalidate all sessions.
 =cut
 
 has secret_key => (
-  is       => 'ro',
-  isa      => Str,
-  required => 1,
+    is       => 'ro',
+    isa      => Str,
+    required => 1,
 );
 
 =attr default_duration
@@ -39,26 +39,26 @@ unset by default, meaning that sessions expiration is not capped.
 =cut
 
 has default_duration => (
-  is        => 'ro',
-  isa       => Int,
-  predicate => 1,
+    is        => 'ro',
+    isa       => Int,
+    predicate => 1,
 );
 
 has _store => (
-  is      => 'lazy',
-  isa     => InstanceOf ['Session::Storage::Secure'],
-  handles => {
-    '_freeze'   => 'encode',
-    '_retrieve' => 'decode',
-  },
+    is      => 'lazy',
+    isa     => InstanceOf ['Session::Storage::Secure'],
+    handles => {
+        '_freeze'   => 'encode',
+        '_retrieve' => 'decode',
+    },
 );
 
 sub _build__store {
-  my ($self) = @_;
-  my %args = ( secret_key => $self->secret_key );
-  $args{default_duration} = $self->default_duration
-    if $self->has_default_duration;
-  return Session::Storage::Secure->new(%args);
+    my ($self) = @_;
+    my %args = ( secret_key => $self->secret_key );
+    $args{default_duration} = $self->default_duration
+      if $self->has_default_duration;
+    return Session::Storage::Secure->new(%args);
 }
 
 with 'Dancer2::Core::Role::SessionFactory';
@@ -73,10 +73,10 @@ sub generate_id { '' }
 # Cookie generation: serialize the session data into the session ID
 # right before the cookie is generated
 before 'cookie' => sub {
-  my ( $self, %params ) = @_;
-  my $session = $params{session};
-  return unless ref $session && $session->isa("Dancer2::Core::Session");
-  $session->id( $self->_freeze( $session->data, $session->expires ) );
+    my ( $self, %params ) = @_;
+    my $session = $params{session};
+    return unless ref $session && $session->isa("Dancer2::Core::Session");
+    $session->id( $self->_freeze( $session->data, $session->expires ) );
 };
 
 #--------------------------------------------------------------------------#
