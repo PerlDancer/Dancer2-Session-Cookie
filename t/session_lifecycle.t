@@ -218,7 +218,7 @@ for my $c (@configs) {
                 port         => $port
             );
 
-            Dancer2->runner->server->port($port);
+            Dancer2->runner->{'port'} = $port;
             start;
         },
     );
