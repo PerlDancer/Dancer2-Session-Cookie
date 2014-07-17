@@ -218,6 +218,7 @@ for my $c (@configs) {
                 port         => $port
             );
 
+            # we're overiding a RO attribute only for this test!
             Dancer2->runner->{'port'} = $port;
             start;
         },
