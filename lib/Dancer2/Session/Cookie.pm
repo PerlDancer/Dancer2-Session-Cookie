@@ -6,7 +6,7 @@ package Dancer2::Session::Cookie;
 # ABSTRACT: Dancer 2 session storage in secure cookies
 # VERSION
 
-use Session::Storage::Secure 0.007 ();
+use Session::Storage::Secure 0.010 ();
 
 use Moo;
 use Dancer2::Core::Types;
@@ -55,7 +55,11 @@ has _store => (
 
 sub _build__store {
     my ($self) = @_;
-    my %args = ( secret_key => $self->secret_key );
+    my %args = (
+        secret_key             => $self->secret_key,
+        sereal_encoder_options => { snappy => 1, stringify_unknown => 1 },
+        sereal_decoder_options => { validate_utf8 => 1 },
+    );
     $args{default_duration} = $self->default_duration
       if $self->has_default_duration;
     return Session::Storage::Secure->new(%args);
