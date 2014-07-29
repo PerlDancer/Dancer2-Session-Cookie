@@ -120,11 +120,25 @@ generate_id
 This module implements a session factory for Dancer 2 that stores session state
 within a browser cookie.  Features include:
 
-=for :list
-* Data serialization and compression using L<Sereal>
-* Data encryption using AES with a unique derived key per cookie
-* Enforced expiration timestamp (independent of cookie expiration)
-* Cookie integrity protected with a message authentication code (MAC)
+=over
+
+=item *
+
+Data serialization and compression using L<Sereal>
+
+=item *
+
+Data encryption using AES with a unique derived key per cookie
+
+=item * 
+
+Enforced expiration timestamp (independent of cookie expiration)
+
+=item * 
+
+Cookie integrity protected with a message authentication code (MAC)
+
+=back
 
 See L<Session::Storage::Secure> for implementation details and important
 security caveats.
@@ -133,13 +147,35 @@ security caveats.
 
 CPAN modules providing cookie session storage (possibly for other frameworks):
 
-=for :list
-* L<Dancer::Session::Cookie> -- Dancer 1 equivalent to this module
-* L<Catalyst::Plugin::CookiedSession> -- encryption only
-* L<HTTP::CryptoCookie> -- encryption only
-* L<Mojolicious::Sessions> -- MAC only
-* L<Plack::Middleware::Session::Cookie> -- MAC only
-* L<Plack::Middleware::Session::SerializedCookie> -- really just a framework and you provide the guts with callbacks
+=over
+
+=item * 
+
+L<Dancer::Session::Cookie> -- Dancer 1 equivalent to this module
+
+
+=item * 
+
+L<Catalyst::Plugin::CookiedSession> -- encryption only
+
+
+=item * 
+
+L<HTTP::CryptoCookie> -- encryption only
+
+=item * 
+
+L<Mojolicious::Sessions> -- MAC only
+
+=item * 
+
+L<Plack::Middleware::Session::Cookie> -- MAC only
+
+=item * 
+
+L<Plack::Middleware::Session::SerializedCookie> -- really just a framework and you provide the guts with callbacks
+
+=back 
 
 =cut
 
