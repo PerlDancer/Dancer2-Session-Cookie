@@ -1,42 +1,32 @@
 Revision history for Dancer2-Session-Cookie
 
-{{$NEXT}}
+0.006 2014-07-28
+ [CHANGED]
+ - Requires Session::Storage::Secure 0.010 to allow storing objects, which
+   is specially relevant to JSON::bool data.
 
-    [CHANGED]
+ [STATISTICS]
+ - code churn: 12 files changed, 423 insertions(+), 477 deletions(-)
 
-    - Requires Session::Storage::Secure 0.010 to allow storing objects,
-      which is specially relevant to JSON::bool data.
+0.005 2013-06-05T22:56:23Z America/New_York
+ [FIXED]
+ - Bumped Test::TCP dependency to 1.30 to avoid parallel testing bugs
 
-0.005     2013-06-05 22:56:23 America/New_York
+0.004 2013-05-31T23:40:09Z America/New_York
+ [CHANGED]
+ - Requires Session::Storage::Secure 0.007 for improved resistance to
+   timing attacks
 
-    [FIXED]
+0.003 2013-05-28T13:42:39Z America/New_York
+ [FIXED]
+ - Fixed Dancer2 dependency version
+ - Fixed tests for new, lazy session creation behavior in Dancer2
 
-    - Bumped Test::TCP dependency to 1.30 to avoid parallel testing bugs
+0.002 2013-02-22T22:26:31Z America/New_York
+ [CHANGED]
+ - Renamed from Dancer-Session-Factory-Cookie to Dancer2-Session-Cookie
+ - Internals updated for new Dancer2 release
 
-0.004     2013-05-31 23:40:09 America/New_York
-
-    [CHANGED]
-
-    - Requires Session::Storage::Secure 0.007 for improved resistance
-      to timing attacks
-
-0.003     2013-05-28 13:42:39 America/New_York
-
-    [FIXED]
-
-    - Fixed Dancer2 dependency version
-
-    - Fixed tests for new, lazy session creation behavior in Dancer2
-
-0.002     2013-02-22 22:26:31 America/New_York
-
-    [CHANGED]
-
-    - Renamed from Dancer-Session-Factory-Cookie to Dancer2-Session-Cookie
-
-    - Internals updated for new Dancer2 release
-
-0.001     2013-01-24 17:33:57 America/New_York
-
-    - First release
+0.001 2013-01-24T17:33:57Z America/New_York
+ - First release
 
