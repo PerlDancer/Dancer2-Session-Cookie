@@ -175,6 +175,10 @@ L<Plack::Middleware::Session::Cookie> -- MAC only
 
 L<Plack::Middleware::Session::SerializedCookie> -- really just a framework and you provide the guts with callbacks
 
+=item *
+
+L<Dancer2::Core::Role::SessionFactory> -- documentation of the base package, some more attributes to configure the cookie
+
 =back 
 
 =cut
