@@ -17,6 +17,7 @@ lib/Dancer2/Session/Cookie.pm
 t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
+t/lib/TestApp.pm
 t/session_lifecycle.t
 xt/release/pause-permissions.t
 xt/release/unused-vars.t
