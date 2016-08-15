@@ -1,6 +1,6 @@
 Revision history for Dancer2-Session-Cookie
 
-{{$NEXT}}
+0.007     2016-08-15
  [BUG FIXES]
  - Remove context usage (GH#9, Sawyer X)
 
