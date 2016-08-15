@@ -5,7 +5,11 @@ Revision history for Dancer2-Session-Cookie
 
  [BUG FIXES]
 
- [DOCUMENTATION]
+ [CHANGED]
+
+ - Update for Dancer2 >= 1.143000.
+ - Requires Session::Storage::Secure 0.010 to allow storing objects,
+   which is specially relevant to JSON::bool data.
 
  [ENHANCEMENTS]
 
