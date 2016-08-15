@@ -65,6 +65,11 @@ sub _build__store {
     return Session::Storage::Secure->new(%args);
 }
 
+sub _change_id {
+    # This is a noop with session cookies.
+    return;
+}
+
 with 'Dancer2::Core::Role::SessionFactory';
 
 #--------------------------------------------------------------------------#

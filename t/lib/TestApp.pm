@@ -16,6 +16,16 @@ get '/read_session' => sub {
     "name='$name'";
 };
 
+get '/change_session_id' => sub {
+    if ( app->can('change_session_id') ) {
+        app->change_session_id;
+        return "change_session_id supported by Dancer2";
+    }
+    else {
+        return "change_session_id not supported by Dancer2";
+    }
+};
+
 get '/destroy_session' => sub {
     my $name = session('name') || '';
     app->destroy_session;

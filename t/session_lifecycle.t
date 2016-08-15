@@ -110,6 +110,30 @@ for my $c (@configs) {
         isnt $jar->as_string, "", "session cookie set"
           or diag explain $jar;
 
+        # change_session_id is a noop with this session engine but test
+        # all the same
+        {
+            my ( $sid1, $sid2 );
+            $req = GET "$url/no_session_data";
+            $jar->add_cookie_header($req);
+            $res = $test->request($req);
+            ok $res->is_success, "/no_session_data";
+            $jar->extract_cookies($res);
+            $jar->scan( sub { $sid1 = $_[2] } );
+            ok( $sid1, "Got SID from cookie: $sid1" );
+
+            $req = GET "$url/change_session_id";
+            $jar->add_cookie_header($req);
+            $res = $test->request($req);
+            ok $res->is_success, "/change_session_id";
+            $jar->extract_cookies($res);
+            $jar->scan( sub { $sid2 = $_[2] } );
+            ok( $sid2, "Got SID from cookie: $sid2" );
+
+            isnt $sid1, $sid2, "session id has changed";
+            diag $res->content;
+        }
+
         # destroy session and check that cookies expiration is set
         $req = GET "$url/destroy_session";
         $jar->add_cookie_header($req);
