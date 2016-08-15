@@ -1,15 +1,14 @@
 Revision history for Dancer2-Session-Cookie
 
 {{$NEXT}}
- [API CHANGES]
-
  [BUG FIXES]
+ - Remove context usage (GH#9, Sawyer X)
 
  [CHANGED]
-
- - Update for Dancer2 >= 1.143000.
- - Requires Session::Storage::Secure 0.010 to allow storing objects,
-   which is specially relevant to JSON::bool data.
+ - Link to base package added in POD (GH#11, Moritz Grosch)
+ - Simplify dzil config (Peter Mottram)
+ - Rewrite tests to use Plack::Test (Peter Mottram)
+ - Add noop _change_id method (Peter Mottram)
 
  [ENHANCEMENTS]
 
