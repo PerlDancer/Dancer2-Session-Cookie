@@ -1,8 +1,11 @@
 Revision history for Dancer2-Session-Cookie
 
 {{$NEXT}}
+ - Up Dancer2 dependency to 0.165, as 0.164 was a broken one. (GH#13)
+
  [DOCUMENTATION]
  - Clarify where 'cookie_duration' is set. (GH#14)
+
 
 0.007     2016-08-15
  [BUG FIXES]
