@@ -1,6 +1,8 @@
 Revision history for Dancer2-Session-Cookie
 
 {{$NEXT}}
+ [DOCUMENTATION]
+ - Clarify where 'cookie_duration' is set. (GH#14)
 
 0.007     2016-08-15
  [BUG FIXES]

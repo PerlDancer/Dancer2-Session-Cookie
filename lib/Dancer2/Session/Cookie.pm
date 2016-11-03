@@ -32,7 +32,8 @@ has secret_key => (
 =attr default_duration
 
 Number of seconds for which the session may be considered valid.  If
-C<cookie_duration> is not set, this is used instead to expire the session after
+C<cookie_duration> is not set as part of the session configuration,
+this is used instead to expire the session after
 a period of time, regardless of the length of the browser session.  It is
 unset by default, meaning that sessions expiration is not capped.
 
