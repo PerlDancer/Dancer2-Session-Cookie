@@ -3,6 +3,9 @@ Revision history for Dancer2-Session-Cookie
 {{$NEXT}}
  - Up Dancer2 dependency to 0.165, as 0.164 was a broken one. (GH#13)
 
+ [ENHANCEMENTS]
+ - Add 'with_request_address' option to configuration. (GH#1)
+
  [DOCUMENTATION]
  - Clarify where 'cookie_duration' is set. (GH#14)
 

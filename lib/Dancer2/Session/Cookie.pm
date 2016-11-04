@@ -45,6 +45,21 @@ has default_duration => (
     predicate => 1,
 );
 
+=attr with_request_address
+
+If set to C<true>, the secret key will have the request address
+(as provided by C<<$request->address>>)
+appended to it. This can help defeat some replay attacks 
+(e.g. if the channel is not secure).
+But it will also cause session interruption for people on dynamic addresses.
+
+=cut
+
+has with_request_address => (
+    is        => 'ro',
+    isa       => Bool,
+);
+
 has _store => (
     is      => 'lazy',
     isa     => InstanceOf ['Session::Storage::Secure'],
@@ -53,6 +68,12 @@ has _store => (
         '_retrieve' => 'decode',
     },
 );
+
+before [qw/ _freeze _retrieve /] => sub {
+    my $self = shift;
+    return unless $self->with_request_address;
+    $self->_store->{secret_key} = join '-', $self->secret_key, $self->request->address;
+};
 
 sub _build__store {
     my ($self) = @_;
@@ -118,8 +139,9 @@ generate_id
   engines:
     session:
       Cookie:
-        secret_key: your secret passphrase
-        default_duration: 604800
+        secret_key:           your secret passphrase
+        default_duration:     604800
+        with_request_address: 0
 
 =head1 DESCRIPTION
 
