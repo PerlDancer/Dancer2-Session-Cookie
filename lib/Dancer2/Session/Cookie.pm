@@ -3,9 +3,10 @@ use strict;
 use warnings;
 
 package Dancer2::Session::Cookie;
+our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Dancer 2 session storage in secure cookies
 # VERSION
-
+$Dancer2::Session::Cookie::VERSION = '0.008';
 use Session::Storage::Secure 0.010 ();
 
 use Moo;
@@ -15,13 +16,6 @@ use Dancer2::Core::Types;
 # Attributes
 #--------------------------------------------------------------------------#
 
-=attr secret_key (required)
-
-This is used to secure the cookies.  Encryption keys and message authentication
-keys are derived from this using one-way functions.  Changing it will
-invalidate all sessions.
-
-=cut
 
 has secret_key => (
     is       => 'ro',
@@ -29,15 +23,6 @@ has secret_key => (
     required => 1,
 );
 
-=attr default_duration
-
-Number of seconds for which the session may be considered valid.  If
-C<cookie_duration> is not set as part of the session configuration,
-this is used instead to expire the session after
-a period of time, regardless of the length of the browser session.  It is
-unset by default, meaning that sessions expiration is not capped.
-
-=cut
 
 has default_duration => (
     is        => 'ro',
@@ -45,15 +30,6 @@ has default_duration => (
     predicate => 1,
 );
 
-=attr with_request_address
-
-If set to C<true>, the secret key will have the request address
-(as provided by C<<$request->address>>)
-appended to it. This can help defeat some replay attacks 
-(e.g. if the channel is not secure).
-But it will also cause session interruption for people on dynamic addresses.
-
-=cut
 
 has with_request_address => (
     is        => 'ro',
@@ -128,8 +104,22 @@ sub _sessions { return [] }
 
 1;
 
-=for Pod::Coverage method_names_here
-generate_id
+
+# vim: ts=4 sts=4 sw=4 et:
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Dancer2::Session::Cookie - Dancer 2 session storage in secure cookies
+
+=head1 VERSION
+
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -171,6 +161,33 @@ Cookie integrity protected with a message authentication code (MAC)
 See L<Session::Storage::Secure> for implementation details and important
 security caveats.
 
+=head1 ATTRIBUTES
+
+=head2 secret_key (required)
+
+This is used to secure the cookies.  Encryption keys and message authentication
+keys are derived from this using one-way functions.  Changing it will
+invalidate all sessions.
+
+=head2 default_duration
+
+Number of seconds for which the session may be considered valid.  If
+C<cookie_duration> is not set as part of the session configuration,
+this is used instead to expire the session after
+a period of time, regardless of the length of the browser session.  It is
+unset by default, meaning that sessions expiration is not capped.
+
+=head2 with_request_address
+
+If set to C<true>, the secret key will have the request address
+(as provided by C<<$request->address>>)
+appended to it. This can help defeat some replay attacks 
+(e.g. if the channel is not secure).
+But it will also cause session interruption for people on dynamic addresses.
+
+=for Pod::Coverage method_names_here
+generate_id
+
 =head1 SEE ALSO
 
 CPAN modules providing cookie session storage (possibly for other frameworks):
@@ -181,11 +198,9 @@ CPAN modules providing cookie session storage (possibly for other frameworks):
 
 L<Dancer::Session::Cookie> -- Dancer 1 equivalent to this module
 
-
 =item * 
 
 L<Catalyst::Plugin::CookiedSession> -- encryption only
-
 
 =item * 
 
@@ -207,8 +222,18 @@ L<Plack::Middleware::Session::SerializedCookie> -- really just a framework and y
 
 L<Dancer2::Core::Role::SessionFactory> -- documentation of the base package, some more attributes to configure the cookie
 
-=back 
+=back
+
+=head1 AUTHOR
+
+David Golden <dagolden@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by David Golden.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
 
 =cut
-
-# vim: ts=4 sts=4 sw=4 et:
