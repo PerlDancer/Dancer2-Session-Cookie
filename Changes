@@ -1,6 +1,8 @@
 Revision history for Dancer2-Session-Cookie
 
 {{$NEXT}}
+
+0.008     2016-11-04
  - Up Dancer2 dependency to 0.165, as 0.164 was a broken one. (GH#13)
 
  [ENHANCEMENTS]
